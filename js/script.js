@@ -1,4 +1,4 @@
-const { tinyFaceDetector, faceLandmark68Net, faceExpressionNet } = faceapi.nets;
+const { tinyFaceDetector, faceLandmark68Net, faceRecognitionNet, faceExpressionNet } = faceapi.nets;
 
 const video = document.getElementById('video');
 const contentEl = document.querySelector('.content');
@@ -10,6 +10,7 @@ const landmarksCheckbox = document.getElementById('landmarks-checkbox');
 Promise.all([
   loadFromNet(tinyFaceDetector),
   loadFromNet(faceLandmark68Net),
+  loadFromNet(faceRecognitionNet),
   loadFromNet(faceExpressionNet),
 ]).then(startVideo);
 
