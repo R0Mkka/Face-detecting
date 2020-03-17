@@ -4,6 +4,9 @@ const video = document.getElementById('video');
 const contentEl = document.querySelector('.content');
 const peopleCountEl = document.querySelector('.people-count__number');
 
+const expressionsCheckbox = document.getElementById('expressions-checkbox');
+const landmarksCheckbox = document.getElementById('landmarks-checkbox');
+
 Promise.all([
   loadFromNet(tinyFaceDetector),
   loadFromNet(faceLandmark68Net),
@@ -22,17 +25,13 @@ video.addEventListener('play', () => {
   faceapi.matchDimensions(canvas, displaySize);
 
   setInterval(async () => {
-    const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
-      // .withFaceLandmarks()
-      // .withFaceExpressions();
-
-    const resizedDetections = faceapi.resizeResults(detections, displaySize);
+    const faceDetections = await determineFaceDetections();
 
     context.clearRect(0, 0, canvas.width, canvas.height);
-    faceapi.draw.drawDetections(canvas, resizedDetections);
-    // faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
-    // faceapi.draw.drawFaceExpressions(canvas, resizedDetections);
-    peopleCountEl.textContent = detections.length.toString();
+    
+    drawResults(faceDetections, canvas, displaySize);
+    
+    peopleCountEl.textContent = faceDetections.length.toString();
   }, 100);
 });
 
@@ -46,4 +45,54 @@ function startVideo() {
 
 function loadFromNet(net) {
   return net.loadFromUri('./models');
+}
+
+async function determineFaceDetections() {
+  switch (true) {
+    case expressionsOnly():
+      return await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
+        .withFaceExpressions();
+    case landmarksOnly():
+      return await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
+        .withFaceLandmarks();
+    case expressionsAndLandmarks():
+      return await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
+        .withFaceLandmarks()
+        .withFaceExpressions();
+    default:
+      return await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions());
+  } 
+}
+
+function drawResults(faceDetections, canvas, displaySize) {
+  const resizedDetections = faceapi.resizeResults(faceDetections, displaySize);
+
+  faceapi.draw.drawDetections(canvas, resizedDetections);
+
+  switch (true) {
+    case expressionsOnly():
+      faceapi.draw.drawFaceExpressions(canvas, resizedDetections);
+      break;
+    case landmarksOnly():
+      faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
+      break;
+    case expressionsAndLandmarks():
+      faceapi.draw.drawFaceExpressions(canvas, resizedDetections);
+      faceapi.draw.drawFaceLandmarks(canvas, resizedDetections);
+      break;
+    default:
+      break;
+  }
+}
+
+function expressionsOnly() {
+  return expressionsCheckbox.checked && !landmarksCheckbox.checked;
+}
+
+function landmarksOnly() {
+  return !expressionsCheckbox.checked && landmarksCheckbox.checked;
+}
+
+function expressionsAndLandmarks() {
+  return expressionsCheckbox.checked && landmarksCheckbox.checked;
 }

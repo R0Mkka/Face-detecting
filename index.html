@@ -13,12 +13,34 @@
 </head>
 <body>
   <div class="content">
-    <div class="people-count">
-      <span class="people-count__label">Количество людей:</span>
-      <span class="people-count__number">0</span>
-    </div>
+    <video id="video" class="content__video" width="600" height="450" autoplay muted></video>
+
+    <div class="content__main-panel">
+      <div class="people-count">
+        <span class="people-count__label">Количество людей:</span>
+        <span class="people-count__number">0</span>
+      </div>
+
+      <hr class="divider">
+
+      <div class="additions">
+        <div class="additions__label">
+          Дополнительные параметры отображения:
+        </div>
   
-    <video id="video" width="720" height="540" autoplay muted></video>
+        <ul class="additions__list">
+          <li class="additions__list-item">
+            <label for="expressions-checkbox" class="additions__list-item-label">Выражение лица</label>
+            <input id="expressions-checkbox" class="additions__list-item-checkbox" type="checkbox">
+          </li>
+          
+          <li class="additions__list-item">
+            <label for="landmarks-checkbox" class="additions__list-item-label">Очертания лица</label>
+            <input id="landmarks-checkbox" class="additions__list-item-checkbox" type="checkbox">
+          </li>
+        </ul>
+      </div>
+    </div>
   </div>
 </body>
 </html>
